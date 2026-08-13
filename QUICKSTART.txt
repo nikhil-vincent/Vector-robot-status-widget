@@ -1,0 +1,38 @@
+Vector Status — quick start
+===========================
+
+1) Install (Debian / Ubuntu / Raspberry Pi OS):
+
+     cd vector-status
+     sudo ./install.sh
+
+   You will be asked for your Vector SSH unlock key (CPU / LOAD).
+   Answer n to skip — BAT / TMP / VOLT still work.
+
+2) Ensure Vector is on Wi-Fi with wire-pod.
+
+3) Open from the menu:  "Vector Status"
+   Or run:  vector-status
+
+4) Widget pops up when Vector is online.
+   Click to cycle BAT / TMP / VOLT / CPU / LOAD
+   Drag to move; right-click for menu
+   Widget hides when Vector disconnects
+
+5) If auto-discovery fails:
+
+     echo 192.168.x.x > ~/.config/vector-status/ip.txt
+
+6) Add a key later (if you skipped the prompt):
+
+     cp /path/to/ssh_root_key ~/.config/vector-status/ssh_root_key
+     chmod 600 ~/.config/vector-status/ssh_root_key
+
+7) Uninstall:
+
+     sudo ./uninstall.sh
+
+Share:
+
+     ./pack.sh
+     # → ../vector-status-1.0.0.tar.gz
