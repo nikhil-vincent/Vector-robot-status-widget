@@ -2,6 +2,18 @@
 
 Floating taskbar-style gauge that **appears when Vector is online** and **hides when offline**.
 
+## Screenshots
+
+| Battery | Temperature | Voltage |
+|---------|-------------|---------|
+| ![Battery 100%](docs/screenshots/bat.png) | ![Temperature 42°C](docs/screenshots/tmp.png) | ![Voltage 4.11 V](docs/screenshots/volt.png) |
+
+| CPU | Load |
+|-----|------|
+| ![CPU 33%](docs/screenshots/cpu.png) | ![Load 3.84](docs/screenshots/load.png) |
+
+Left-click cycles **BAT → TMP → VOLT → CPU → LOAD**.
+
 ## Features
 
 | Feature | Detail |
