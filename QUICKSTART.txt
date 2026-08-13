@@ -6,7 +6,7 @@ Vector Status — quick start
      cd vector-status
      sudo ./install.sh
 
-   You will be asked for your Vector SSH unlock key (CPU / LOAD).
+   You will be asked for your Vector SSH unlock key (CPU / LOAD / RAM).
    Answer n to skip — BAT / TMP / VOLT still work.
 
 2) Ensure Vector is on Wi-Fi with wire-pod.
@@ -15,7 +15,7 @@ Vector Status — quick start
    Or run:  vector-status
 
 4) Widget pops up when Vector is online.
-   Click to cycle BAT / TMP / VOLT / CPU / LOAD
+   Click to cycle BAT / TMP / VOLT / CPU / LOAD / RAM
    Drag to move; right-click for menu
    Widget hides when Vector disconnects
 

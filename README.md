@@ -12,20 +12,20 @@ Floating taskbar-style gauge that **appears when Vector is online** and **hides 
 |-----|------|
 | ![CPU 33%](docs/screenshots/cpu.png) | ![Load 3.84](docs/screenshots/load.png) |
 
-Left-click cycles **BAT → TMP → VOLT → CPU → LOAD**.
+Left-click cycles **BAT → TMP → VOLT → CPU → LOAD → RAM**.
 
 ## Features
 
 | Feature | Detail |
 |---------|--------|
 | Online-only | Shows when engine stats (`:8888`) are reachable |
-| Meters | Left-click cycles **BAT → TMP → VOLT → CPU → LOAD** |
+| Meters | Left-click cycles **BAT → TMP → VOLT → CPU → LOAD → RAM** |
 | Tray icon | Always present (green online / grey offline) |
 | Drag to move | Position saved under `~/.config/vector-status/` |
 | Autostart | Starts at login after install |
 | Single instance | File lock prevents duplicate widgets |
 
-Battery % is derived from voltage (same curve as Vector’s `vs` script). CPU and LOAD need an optional SSH unlock key — battery/temp/voltage work without it.
+Battery % is derived from voltage (same curve as Vector’s `vs` script). CPU, LOAD, and RAM need an optional SSH unlock key — battery/temp/voltage work without it.
 
 ## Requirements
 
@@ -44,7 +44,7 @@ cd vector-status
 sudo ./install.sh
 ```
 
-The installer asks for your Vector SSH unlock key (for CPU / LOAD). You can skip it; BAT / TMP / VOLT still work.
+The installer asks for your Vector SSH unlock key (for CPU / LOAD / RAM). You can skip it; BAT / TMP / VOLT still work.
 
 Options:
 
@@ -66,7 +66,7 @@ vector-status &
 
 | Action | Result |
 |--------|--------|
-| **Left-click** | Cycle BAT → TMP → VOLT → CPU → LOAD |
+| **Left-click** | Cycle BAT → TMP → VOLT → CPU → LOAD → RAM |
 | **Drag** | Move anywhere (saved) |
 | **Right-click** | Menu (refresh, reset position, quit) |
 
@@ -79,10 +79,10 @@ Saved under `~/.config/vector-status/`:
 | File | Purpose |
 |------|---------|
 | `position.txt` | Last x,y of the gauge |
-| `mode.txt` | Last meter (BAT / TMP / VOLT / CPU / LOAD) |
+| `mode.txt` | Last meter (BAT / TMP / VOLT / CPU / LOAD / RAM) |
 | `ip.txt` | Optional Vector IP override |
 | `face.png` | Optional face-image override |
-| `ssh_root_key` | Optional Vector unlock key (CPU / LOAD only) |
+| `ssh_root_key` | Optional Vector unlock key (CPU / LOAD / RAM only) |
 
 If auto-discovery fails:
 
@@ -98,9 +98,9 @@ echo 192.168.x.x > ~/.config/vector-status/ip.txt
 
 If that works → widget **shows**. Otherwise → widget **hides**.
 
-### Optional SSH (CPU / LOAD)
+### Optional SSH (CPU / LOAD / RAM)
 
-CPU and load meters SSH into Vector as `root`. The key is **not** included in this package.
+CPU, load, and RAM meters SSH into Vector as `root`. The key is **not** included in this package.
 
 `sudo ./install.sh` prompts for the path to your unlock key and copies it to `~/.config/vector-status/ssh_root_key` (mode 600). You can skip the prompt.
 
@@ -117,7 +117,7 @@ The widget also accepts:
 - `~/.ssh/id_rsa_vector`
 - `export VECTOR_SSH_KEY=/path/to/your/key`
 
-Without a key, BAT / TMP / VOLT still work.
+Without a key, BAT / TMP / VOLT still work. RAM shows used/total percent from Vector’s `free -m`.
 
 ## Uninstall
 

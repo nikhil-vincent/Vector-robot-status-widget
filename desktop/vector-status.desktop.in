@@ -2,7 +2,7 @@
 Type=Application
 Name=Vector Status
 GenericName=Vector Battery and Stats Gauge
-Comment=Floating Vector battery/temp/CPU stats when the robot is online
+Comment=Floating Vector battery/temp/CPU/RAM stats when the robot is online
 Exec=/usr/bin/python3 @PREFIX@/lib/vector-status/vector-status.py
 Icon=@PREFIX@/lib/vector-status/assets/vector-face.png
 Terminal=false

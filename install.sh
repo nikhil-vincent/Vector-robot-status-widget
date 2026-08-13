@@ -104,7 +104,7 @@ chown -R "$TARGET_USER:$TARGET_GROUP" \
   "$TARGET_HOME/.config/autostart/vector-status.desktop"
 
 # ---------------------------------------------------------------------------
-# Optional Vector SSH unlock key (CPU / LOAD meters)
+# Optional Vector SSH unlock key (CPU / LOAD / RAM meters)
 # Never shipped in the package — copied from a path the user provides.
 # ---------------------------------------------------------------------------
 is_ssh_private_key() {
@@ -200,13 +200,13 @@ if [[ -n "${VECTOR_SSH_KEY:-}" ]]; then
     SSH_KEY_INSTALLED=1
   else
     echo "VECTOR_SSH_KEY was set but could not be installed."
-    echo "CPU/LOAD will be unavailable until you add a key."
+    echo "CPU/LOAD/RAM will be unavailable until you add a key."
   fi
 elif [[ "${SKIP_SSH_KEY:-}" == "1" ]]; then
   echo "Skipping SSH key setup (SKIP_SSH_KEY=1)."
 elif [[ -r /dev/tty ]]; then
   echo
-  echo "CPU and LOAD meters need Vector's SSH unlock key."
+  echo "CPU, LOAD, and RAM meters need Vector's SSH unlock key."
   echo "Battery, temperature, and voltage work without it."
   echo "The key is NOT included in this package — you provide your own."
   echo
@@ -223,7 +223,7 @@ elif [[ -r /dev/tty ]]; then
       echo "Keeping existing key at $DEST_KEY"
     fi
   else
-    read -r -p "Install Vector SSH unlock key for CPU/LOAD? [Y/n] " WANT_KEY < /dev/tty || WANT_KEY=""
+    read -r -p "Install Vector SSH unlock key for CPU/LOAD/RAM? [Y/n] " WANT_KEY < /dev/tty || WANT_KEY=""
     WANT_KEY="${WANT_KEY:-Y}"
     if [[ "$WANT_KEY" =~ ^[Yy]$ ]]; then
       if ask_for_ssh_key_path; then
@@ -262,15 +262,15 @@ echo "  # or: Applications → Vector Status"
 echo
 echo "Controls:"
 echo "  Drag          move the gauge"
-echo "  Left-click    cycle BAT → TMP → VOLT → CPU → LOAD"
+echo "  Left-click    cycle BAT → TMP → VOLT → CPU → LOAD → RAM"
 echo "  Right-click   menu (refresh, reset position, quit)"
 echo
 echo "Widget appears when Vector is online and hides when offline."
 echo "Optional IP override: echo YOUR_IP > $CFGDIR/ip.txt"
 if [[ "$SSH_KEY_INSTALLED" -eq 1 ]]; then
-  echo "SSH key installed — CPU / LOAD meters are available."
+  echo "SSH key installed — CPU / LOAD / RAM meters are available."
 else
-  echo "No SSH key — BAT / TMP / VOLT work; CPU / LOAD need a key:"
+  echo "No SSH key — BAT / TMP / VOLT work; CPU / LOAD / RAM need a key:"
   echo "  copy your unlock key to $CFGDIR/ssh_root_key && chmod 600 $CFGDIR/ssh_root_key"
 fi
 echo

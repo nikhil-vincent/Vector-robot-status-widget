@@ -7,7 +7,7 @@ reachable via wire-pod-reported IP + engine stats (HTTP :8888).
 
   • Appears when Vector is connected / stats reachable
   • Disappears when Vector goes offline
-  • Left-click  = cycle meter: BAT → TMP → VOLT
+  • Left-click  = cycle meter: BAT → TMP → VOLT → CPU → LOAD → RAM
   • Drag        = move
   • Right-click = menu
   • Tray icon always present (green online / grey offline)
@@ -69,7 +69,7 @@ FACE_EYES = os.path.join(_ASSET_DIR, "vector-eyes.png")  # alt: wire-pod face
 BOT_SDK_INFO = "/etc/wire-pod/wire-pod/jdocs/botSdkInfo.json"
 SDK_CONFIG = os.path.join(os.path.expanduser("~"), ".anki_vector", "sdk_config.ini")
 
-MODES = ("BAT", "TMP", "VOLT", "CPU", "LOAD")
+MODES = ("BAT", "TMP", "VOLT", "CPU", "LOAD", "RAM")
 
 # Engine stats mask — same as Vector /root/vs
 ENG_MASK = "11111100000000000000000000000000000000000000"
@@ -478,8 +478,8 @@ def probe_vector(
 
     Online = engine stats on :8888 (cheap HTTP — always used).
 
-    CPU/LOAD need SSH. Pass want_sys=True only when the user is viewing
-    the CPU or LOAD meter so we don't hammer SSH (battery) every poll.
+    CPU/LOAD/RAM need SSH. Pass want_sys=True only when the user is viewing
+    those meters so we don't hammer SSH (battery) every poll.
     """
     ip = discover_ip()
     if not ip:
@@ -503,7 +503,7 @@ def probe_vector(
     stats["sdk"] = sdk
     stats["sys_polled"] = False
 
-    # Attach last known CPU/LOAD from sampler (may be stale if not on those screens)
+    # Attach last known sys stats from sampler (may be stale if not on those screens)
     if cpu_sampler is not None:
         stats["cpu_percent"] = cpu_sampler.cpu_percent
         stats["load"] = cpu_sampler.load
@@ -512,7 +512,7 @@ def probe_vector(
         stats["mem_used"] = cpu_sampler.mem_used
         stats["mem_total"] = cpu_sampler.mem_total
 
-    # Heavy path: SSH only when user is on CPU/LOAD
+    # Heavy path: SSH only when user is on CPU/LOAD/RAM
     if want_sys and ssh_port:
         sys_stats = fetch_sys_stats_ssh(ip)
         stats["sys_polled"] = True
@@ -582,6 +582,13 @@ def reading_for_mode(mode: str, stats: dict) -> tuple[float, str, str]:
         # 100% needle when load == number of cores (same idea as PC speedometer)
         needle = max(0.0, min(100.0, 100.0 * float(load) / cores))
         return needle, f"{load:.2f}", "LOAD"
+    if mode == "RAM":
+        used = stats.get("mem_used")
+        total = stats.get("mem_total")
+        if used is None or not total:
+            return 0.0, "—", "RAM"
+        pct = max(0.0, min(100.0, 100.0 * float(used) / float(total)))
+        return pct, f"{pct:.0f}", "RAM"
     # BAT
     pct = float(stats.get("batt_pct") or 0)
     return pct, f"{pct:.0f}", "BAT"
@@ -799,7 +806,7 @@ def draw_vector_gauge(ctx, width, height, percent, label, value_text, online=Tru
     ctx.fill()
 
     # Value (+ unit; skip V when showing level name after reboot zero-volts)
-    if label == "BAT" or label == "CPU":
+    if label in ("BAT", "CPU", "RAM"):
         unit = "%"
     elif label == "TMP":
         unit = "°C"
@@ -955,7 +962,7 @@ class VectorStatusApp:
         item_refresh.connect("activate", lambda *_: self._tick())
         menu.append(item_refresh)
 
-        item_cycle = Gtk.MenuItem(label="Next meter (BAT/TMP/VOLT/CPU/LOAD)")
+        item_cycle = Gtk.MenuItem(label="Next meter (BAT/TMP/VOLT/CPU/LOAD/RAM)")
         item_cycle.connect("activate", lambda *_: self._cycle_mode())
         menu.append(item_cycle)
 
@@ -977,8 +984,8 @@ class VectorStatusApp:
         self._set_position(x, y, persist=True)
 
     def _mode_needs_ssh(self) -> bool:
-        """CPU/LOAD need SSH; everything else is cheap HTTP only."""
-        return (self._mode or "").upper() in ("CPU", "LOAD")
+        """CPU/LOAD/RAM need SSH; everything else is cheap HTTP only."""
+        return (self._mode or "").upper() in ("CPU", "LOAD", "RAM")
 
     def _cycle_mode(self, *_args):
         idx = MODES.index(self._mode) if self._mode in MODES else 0
@@ -1081,7 +1088,7 @@ class VectorStatusApp:
         sys_note = (
             "live SSH"
             if s.get("sys_polled")
-            else "CPU/LOAD only polled on those screens (eco)"
+            else "CPU/LOAD/RAM only polled on those screens (eco)"
         )
         tip = (
             f"Vector online\n"
@@ -1090,7 +1097,7 @@ class VectorStatusApp:
             f"Temp: {s.get('temp_c'):.0f}°C · Charging: {chg}\n"
             f"CPU: {cpu_s} · {mhz_s} · Load: {load_s} / {cores} cores · RAM: {mem_s}\n"
             f"Sys: {sys_note}\n"
-            f"Click = BAT/TMP/VOLT/CPU/LOAD  ·  Drag to move"
+            f"Click = BAT/TMP/VOLT/CPU/LOAD/RAM  ·  Drag to move"
         )
         tooltip.set_text(tip)
         return True
